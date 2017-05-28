@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="com.example.android.socialkakao">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -21,7 +22,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="@string/kakao_scheme"
-                      android:host="@string/kakaolink_host" />
+                      android:host="@string/kakaolink_host"
+                      tools:ignore="ManifestResource"/>
             </intent-filter>
         </activity>
         <meta-data
