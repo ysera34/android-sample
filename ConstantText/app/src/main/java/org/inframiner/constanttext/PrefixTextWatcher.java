@@ -9,7 +9,7 @@ import android.widget.EditText;
  * Created by yoon on 2017. 5. 30..
  */
 
-public class PrefixTextWatcher implements TextWatcher {
+public abstract class PrefixTextWatcher implements TextWatcher {
 
     private EditText mEditText;
     private String mPrefixText;
@@ -34,8 +34,14 @@ public class PrefixTextWatcher implements TextWatcher {
     @Override
     public void afterTextChanged(Editable s) {
         if (!s.toString().contains(mPrefixText)) {
+            if (s.toString().length() < mPrefixText.length()) {
+                notifyTextChanged();
+            }
+
             mEditText.setText(mPrefixText);
             Selection.setSelection(mEditText.getText(), mEditText.getText().length());
         }
     }
+
+    abstract void notifyTextChanged();
 }
