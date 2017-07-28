@@ -6,6 +6,17 @@ package com.android.sample.sqlite.model;
 
 public class Category {
 
+    /**
+     * category Group, Part, Piece
+     *
+     * Group name, resource (true, false)
+     * Part name, resource  (true, false)
+     * Piece name, categoryNumber
+     *
+     *
+     *
+     */
+
     private int mId;
     private int mNumber;
     private String mName;
@@ -33,4 +44,10 @@ public class Category {
     public void setName(String name) {
         mName = name;
     }
+
+    private String mCategoryGroupName;
+    private String mCategoryPartName;
+    private int mCategoryPartResId;
+    private String mCategoryPieceName;
+    private String mCategoryNumber;
 }
