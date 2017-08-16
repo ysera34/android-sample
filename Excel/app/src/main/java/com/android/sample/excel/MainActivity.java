@@ -9,13 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,17 +58,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             File file = new File(Environment.getExternalStorageDirectory() + File.separator + filePath, filename);
             FileInputStream fis = new FileInputStream(file);
 
-            POIFSFileSystem poifsFileSystem = new POIFSFileSystem(fis);
-            HSSFWorkbook hssfWorkbook = new HSSFWorkbook(poifsFileSystem);
-            HSSFSheet sheet = hssfWorkbook.getSheetAt(0);
+//            POIFSFileSystem poifsFileSystem = new POIFSFileSystem(fis);
+//            HSSFWorkbook hssfWorkbook = new HSSFWorkbook(poifsFileSystem);
+//            HSSFSheet sheet = hssfWorkbook.getSheetAt(0);
+
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            XSSFSheet sheet = workbook.getSheetAt(0);
 
             Iterator<Row> rowIterator = sheet.rowIterator();
 
             while (rowIterator.hasNext()) {
-                HSSFRow row = (HSSFRow) rowIterator.next();
+//                HSSFRow row = (HSSFRow) rowIterator.next();
+                Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
                 while (cellIterator.hasNext()) {
-                    HSSFCell cell = (HSSFCell) cellIterator.next();
+//                    HSSFCell cell = (HSSFCell) cellIterator.next();
+                    Cell cell = cellIterator.next();
                     Log.i(TAG, "readExcelFile: Cell Value: " + cell.toString());
                 }
             }
@@ -81,12 +83,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void readExcelXlsxFile(Context context, String filename) {
+
+    }
+
     public boolean isExternalStorageReadOnly() {
         String externalStorageState = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(externalStorageState)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED_READ_ONLY.equals(externalStorageState);
     }
 
     public boolean isExternalStorageAvailable() {
