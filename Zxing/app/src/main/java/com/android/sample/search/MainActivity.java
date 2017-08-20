@@ -13,9 +13,16 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -25,8 +32,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String CLIENT_SECRET = "XMAEJ7ajhb";
 
     private String mISBNText;
+    private String mName;
     private Button mStartButton;
     private Button mISBNRequestButton;
+    private Button mNaverRequestButton;
     private TextView mISBNTextView;
     private TextView mProductNameTextView;
 
@@ -38,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mStartButton.setOnClickListener(this);
         mISBNRequestButton = (Button) findViewById(R.id.isbn_request_button);
         mISBNRequestButton.setOnClickListener(this);
+        mNaverRequestButton = (Button) findViewById(R.id.naver_request_button);
+        mNaverRequestButton.setOnClickListener(this);
         mISBNTextView = (TextView) findViewById(R.id.isbn_text_view);
         mProductNameTextView = (TextView) findViewById(R.id.product_name_text_view);
     }
@@ -53,6 +64,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     new ISBNRequestTask().execute(mISBNText);
                 } else {
                     Toast.makeText(this, "바코드를 검색하세요", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.naver_request_button:
+                if (mName != null) {
+                    new NaverRequestTask().execute(mName);
+                } else {
+                    Toast.makeText(this, "이름을 요청하세요", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -71,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected String doInBackground(String... params) {
             String url = "http://www.koreannet.or.kr/home/hpisSrchGtin.gs1?gtin="+params[0];
-            Log.i("url", url);
+            Log.i("ISBNRequestTask url", url);
             String html = null;
 
             try {
@@ -106,8 +124,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             // s = s.split("\\s+")[1];
-            s = s.substring(s.indexOf(' ')).trim();
+            s = s.replace("&nbsp;", "");
+            Log.i(TAG, "onPostExecute: s:" + s);
+            s = s.replaceFirst("^ *", "");
+            Log.i(TAG, "onPostExecute: s:" + s);
+            mName = s;
             mProductNameTextView.setText(getString(R.string.product_name_format, s));
+        }
+    }
+
+    private class NaverRequestTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            String url = "https://openapi.naver.com/v1/search/shop.json?query="+params[0];
+            Log.i("NaverRequestTask url", url);
+
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("X-Naver-Client-Id", CLIENT_ID);
+                connection.setRequestProperty("X-Naver-Client-Secret", CLIENT_SECRET);
+
+                InputStream in = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+                String line;
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((line = reader.readLine()) != null) {
+                    Log.i(TAG, "line: " + line + "\n");
+                    stringBuilder.append(line).append("\n");
+                }
+                in.close();
+                connection.disconnect();
+                JSONObject jsonObject = new JSONObject(stringBuilder.toString());
+//                Log.d(TAG, "doInBackground: jsonObject:" + jsonObject.toString());
+
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: exception:" + e.getMessage());
+            }
+            return "";
         }
     }
 }

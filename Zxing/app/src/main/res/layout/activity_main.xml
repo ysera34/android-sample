@@ -22,6 +22,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="request"/>
+
+        <Button
+            android:id="@+id/naver_request_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="naver"/>
     </LinearLayout>
 
     <LinearLayout
